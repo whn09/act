@@ -13,36 +13,50 @@ mkdir -p sim ckpt
 
 export MUJOCO_GL=egl
 
-python record_sim_episodes.py \
---task_name sim_transfer_cube_scripted \
---dataset_dir sim/sim_transfer_cube_scripted \
---num_episodes 50
+# python record_sim_episodes.py \
+# --task_name sim_transfer_cube_scripted \
+# --dataset_dir sim/sim_transfer_cube_scripted \
+# --num_episodes 50
 
-python visualize_episodes.py \
---dataset_dir sim/sim_transfer_cube_scripted \
---episode_idx 0
+# python record_sim_episodes.py \
+# --task_name sim_insertion_scripted \
+# --dataset_dir sim/sim_insertion_scripted \
+# --num_episodes 50
 
-python visualize_episodes.py \
---dataset_dir sim/sim_transfer_cube_scripted \
---episode_idx 49
+# python visualize_episodes.py \
+# --dataset_dir sim/sim_transfer_cube_scripted \
+# --episode_idx 0
+
+# python visualize_episodes.py \
+# --dataset_dir sim/sim_insertion_scripted \
+# --episode_idx 0
+
+# python imitate_episodes.py \
+# --task_name sim_transfer_cube_scripted \
+# --ckpt_dir ckpt/sim_transfer_cube_scripted \
+# --policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 8 --dim_feedforward 3200 \
+# --num_epochs 2000 --lr 1e-5 \
+# --seed 0
+# --eval
 
 python imitate_episodes.py \
---task_name sim_transfer_cube_scripted \
---ckpt_dir ckpt/sim_transfer_cube_scripted \
+--task_name sim_insertion_scripted \
+--ckpt_dir ckpt/sim_insertion_scripted \
 --policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 8 --dim_feedforward 3200 \
 --num_epochs 2000 --lr 1e-5 \
 --seed 0
 
-python imitate_episodes.py \
---task_name sim_transfer_cube_scripted \
---ckpt_dir ckpt/sim_transfer_cube_scripted \
---policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 64 --dim_feedforward 3200 \
---num_epochs 2000 --lr 6e-5 \
---seed 0
+# python imitate_episodes.py \
+# --task_name sim_transfer_cube_scripted \
+# --ckpt_dir ckpt/sim_transfer_cube_scripted \
+# --policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 64 --dim_feedforward 3200 \
+# --num_epochs 2000 --lr 6e-5 \
+# --eval
 
 python imitate_episodes.py \
---task_name sim_transfer_cube_scripted \
---ckpt_dir ckpt/sim_transfer_cube_scripted \
---policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 64 --dim_feedforward 3200 \
---num_epochs 2000 --lr 6e-5 \
+--task_name sim_insertion_scripted \
+--ckpt_dir ckpt/sim_insertion_scripted \
+--policy_class ACT --kl_weight 10 --chunk_size 100 --hidden_dim 512 --batch_size 8 --dim_feedforward 3200 \
+--num_epochs 2000 --lr 1e-5 \
+--seed 0 \
 --eval
