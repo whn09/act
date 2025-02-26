@@ -420,10 +420,10 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt_dir', action='store', type=str, help='ckpt_dir', required=True)
     parser.add_argument('--policy_class', action='store', type=str, help='policy_class, capitalize', required=True)
     parser.add_argument('--task_name', action='store', type=str, help='task_name', required=True)
-    parser.add_argument('--batch_size', action='store', type=int, help='batch_size', required=True)
-    parser.add_argument('--seed', action='store', type=int, help='seed', required=True)
-    parser.add_argument('--num_epochs', action='store', type=int, help='num_epochs', required=True)
-    parser.add_argument('--lr', action='store', type=float, help='lr', required=True)
+    parser.add_argument('--batch_size', action='store', type=int, help='batch_size', required=False)
+    parser.add_argument('--seed', action='store', type=int, help='seed', required=False)
+    parser.add_argument('--num_epochs', action='store', type=int, help='num_epochs', required=False)
+    parser.add_argument('--lr', action='store', type=float, help='lr', required=False)
 
     # for ACT
     parser.add_argument('--kl_weight', action='store', type=int, help='KL Weight', required=False)
