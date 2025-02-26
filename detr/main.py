@@ -67,6 +67,71 @@ def get_args_parser():
     return parser
 
 
+def visualize_model(model):
+    # pip install tensorboard onnx netron
+    from torch.utils.tensorboard import SummaryWriter
+    import torchvision.transforms as transforms
+    
+    # 创建一个包装类，处理None输入和normalize
+    class ModelWrapper(torch.nn.Module):
+        def __init__(self, model):
+            super().__init__()
+            self.model = model
+            self.normalize = transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        
+        def forward(self, qpos, image, actions, is_pad):
+            # 应用模型中相同的预处理
+            image = self.normalize(image)
+            actions = actions[:, :self.model.num_queries]
+            is_pad = is_pad[:, :self.model.num_queries]
+            env_state = None
+            return self.model(qpos, image, env_state, actions, is_pad)
+    
+    # 创建每个输入的模拟数据
+    batch_size = 1
+
+    # 假设的尺寸，请根据实际情况调整
+    image_shape = (batch_size, 1, 3, 480, 640)  # 例如：(批次大小, 通道数, 高度, 宽度)
+    qpos_shape = (batch_size, 14)  # 例如：(批次大小, 位置维度)
+    action_shape = (batch_size, 400, 14)  # 例如：(批次大小, 动作维度)
+    is_pad_shape = (batch_size, 400)  # 例如：(批次大小, 1)
+
+    # 创建dummy tensors
+    dummy_qpos_data = torch.randn(*qpos_shape)
+    dummy_image_data = torch.randn(*image_shape)
+    dummy_action_data = torch.randn(*action_shape)
+    dummy_is_pad = torch.zeros(*is_pad_shape)
+    
+    # 包装模型以便TensorBoard可视化
+    model_wrapper = ModelWrapper(model)
+
+    # 对于TensorBoard可视化
+    writer = SummaryWriter('logs/model_visualization')
+    writer.add_graph(model_wrapper, [dummy_qpos_data, dummy_image_data, dummy_action_data, dummy_is_pad])
+    writer.close()
+
+    # 对于ONNX导出
+    torch.onnx.export(
+        model_wrapper,  # 要导出的模型
+        (dummy_qpos_data, dummy_image_data, dummy_action_data, dummy_is_pad),  # 模拟输入的元组
+        "model.onnx",  # 输出文件名
+        input_names=["qpos_data", "image_data", "action_data", "is_pad"],  # 输入名称
+        output_names=["output"],  # 输出名称
+        dynamic_axes={  # 动态轴（如果有批次大小是可变的）
+            "qpos_data": {0: "batch_size"},
+            "image_data": {0: "batch_size"},
+            "action_data": {0: "batch_size"},
+            "is_pad": {0: "batch_size"},
+            "output": {0: "batch_size"}
+        }
+    )
+    
+    # netron model.onnx
+    
+
 def build_ACT_model_and_optimizer(args_override):
     parser = argparse.ArgumentParser('DETR training and evaluation script', parents=[get_args_parser()])
     args = parser.parse_args()
@@ -75,6 +140,7 @@ def build_ACT_model_and_optimizer(args_override):
         setattr(args, k, v)
 
     model = build_ACT_model(args)
+    # visualize_model(model)
     model.cuda()
 
     param_dicts = [

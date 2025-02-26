@@ -95,7 +95,8 @@ class DETRVAE(nn.Module):
             encoder_input = torch.cat([cls_embed, qpos_embed, action_embed], axis=1) # (bs, seq+1, hidden_dim)
             encoder_input = encoder_input.permute(1, 0, 2) # (seq+1, bs, hidden_dim)
             # do not mask cls token
-            cls_joint_is_pad = torch.full((bs, 2), False).to(qpos.device) # False: not a padding
+            # cls_joint_is_pad = torch.full((bs, 2), False).to(qpos.device) # False: not a padding
+            cls_joint_is_pad = torch.zeros((bs, 2), dtype=torch.bool, device=qpos.device)
             is_pad = torch.cat([cls_joint_is_pad, is_pad], axis=1)  # (bs, seq+1)
             # obtain position embedding
             pos_embed = self.pos_table.clone().detach()
